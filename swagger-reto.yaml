@@ -1,0 +1,196 @@
+swagger: "2.0"
+info:
+  description: "This is a sample server planetstore server"
+  version: "1.0.0"
+  title: "Swagger planetstore"
+  contact:
+    email: "royerleandroroblesvega@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "planetstore.swagger.io"
+basePath: "/api/planet/v1"
+tags:
+- name: "planet"
+  description: "Everything about your planets"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
+paths:
+  /planet:
+    post:
+      tags:
+      - "planet"
+      summary: "Add a new planet to the store"
+      description: "Add a new planet to the store"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "planet object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/Planet"
+      responses:
+        "201":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/RespuestaCreacionPlaneta"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "planet not found"
+    get:
+      tags:
+      - "planet"
+      summary: "Returns all planets"
+      description: "Returns all planets"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/RespuestaListadoPlanetas"
+  /planet/{id}:
+    get:
+      tags:
+      - "planet"
+      summary: "Find planet by ID"
+      description: "Returns a single planet"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of planet to return"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Planet"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "planet not found"
+  /planet/info-by-id/{id}:
+    get:
+      tags:
+      - "planet"
+      summary: "Find planet by ID"
+      description: "Returns a single planet"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of planet to return"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Planet"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "planet not found"
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  RespuestaCreacionPlaneta:
+    type: object
+    properties: 
+      message: 
+        type: string
+        description: "Mensaje de respuesta"
+        example: "Sucessfully submitted planet with name Tierra"
+      planetId: 
+        type: string
+        description: Identificador generado por DynamoDB
+        example: "e0f430a0-f4e1-11ea-8b40-794c10d626ee"
+  RespuestaListadoPlanetas:
+    type: object
+    properties: 
+      planetas: 
+        type: array
+        items: 
+          $ref: "#/definitions/Planet"
+        description: "Listado de Planetas"
+  Planet:
+    type: object
+    properties: 
+      nombre: 
+        type: string
+        description: el nombre de este planeta
+        example: "Tatooine"
+      diametro: 
+        type: string
+        description: El diámetro de este planeta en kilómetros
+        example: "10465"
+      periodoRotacion: 
+        type: string
+        description: la cantidad de horas estándar que le toma a este planeta completar una sola rotación sobre su eje
+        example: "23"
+      periodoOrbital: 
+        type: string
+        description: periodo Orbital del planeta
+        example: "304"
+      clima: 
+        type: string
+        description: clima del planeta
+        example: "Arido"
+      gravedad: 
+        type: string
+        description: Un número que indica la gravedad de este planeta, donde "1" es normal o 1 estándar G. "2" es dos veces o 2 G estándar. "0.5" es la mitad o 0.5 G estándar
+        example: "1"
+      poblacion: 
+        type: string
+        description: La población promedio de seres sintientes que habitan este planeta
+        example: "120000"
+      residentes: 
+        type: array
+        description: un conjunto de recursos URL de personas que viven en este planeta
+        items: 
+          type: string
+          description: URL de la persona que vive en este planeta
+          example: "https://swapi.py4e.com/api/people/1/"
+      peliculas: 
+        type: array
+        description: un conjunto de recursos de URL de películas en los que ha aparecido este planeta
+        items: 
+          type: string
+          description: URL de película que ha aparecido este planeta
+          example: "https://swapi.py4e.com/api/films/1/"
+      aguaSuperficial: 
+        type: string
+        description: El porcentaje de la superficie del planeta que es agua o cuerpos de agua de origen natural
+        example: "1"
+      creacion: 
+        type: string
+        description: el formato de fecha ISO 8601 de la hora en que se creó este recurso
+        example: "2014-12-10T11:35:48.479000Z"
+      edicion: 
+        type: string
+        description: el formato de fecha ISO 8601 de la hora en que se editó este recurso.
+        example: "2014-12-20T20:58:18.420000Z"
+      terreno: 
+        type: string
+        description: El terreno de este planeta. Separados por comas si son diversos
+        example: "Dessert"
+      url: 
+        type: string
+        description: url del planeta
+        example: "https://swapi.py4e.com/api/planets/1/"

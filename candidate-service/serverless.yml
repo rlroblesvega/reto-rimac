@@ -1,0 +1,97 @@
+service: planet-service
+
+frameworkVersion: "2"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-2
+
+  apiKeys:
+    - planet-service-apikey
+  environment:
+    PLANET_TABLE: planet-${opt:stage, self:provider.stage}
+    PLANET_NAME_TABLE: "planet-name-${opt:stage, self:provider.stage}"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/planet-*"
+
+functions:
+  planetSubmission:
+    handler: api/planet.submit
+    memorySize: 128
+    description: Submit planet information and starts interview process.
+    events:
+      - http: 
+          path: planet
+          method: post
+          cors: true
+          private: true
+  listPlanets:
+    handler: api/planet.list
+    memorySize: 128
+    description: List all planets
+    events:
+      - http: 
+          path: planet
+          method: get
+          cors: true
+          private: true     
+  planetDetails:
+    handler: api/planet.get
+    events:
+      - http:
+          path: planet/{id}
+          method: get
+          cors: true
+          private: true
+  getInfoPlanet:
+    handler: api/planet.getInfoPlanet
+    events:
+      - http:
+          path: planet/info-by-id/{id}
+          method: get
+          cors: true             
+          private: true
+resources:
+  Resources:
+    PlanetsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: "id"
+            AttributeType: "S"   
+        KeySchema:
+          -
+            AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        StreamSpecification:
+          StreamViewType: "NEW_IMAGE"
+        TableName: ${self:provider.environment.PLANET_TABLE}
+    PlanetNameDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: "name"
+            AttributeType: "S"
+        KeySchema:
+          -
+            AttributeName: "name"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        TableName: ${self:provider.environment.PLANET_NAME_TABLE}
